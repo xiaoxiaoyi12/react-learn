@@ -1,15 +1,29 @@
 package com.unity.mynativeapp;
 
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.provider.Settings;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
+
+import com.unity3d.player.UnityPlayer;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final int REQUEST_CODE = 200;
     boolean isUnityLoaded = false;
 
     @Override
@@ -17,12 +31,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
         handleIntent(getIntent());
+//        startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), REQUEST_CODE);
     }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -46,37 +59,43 @@ public class MainActivity extends AppCompatActivity {
 
     public void btnLoadUnity(View v) {
         isUnityLoaded = true;
-        Intent intent = new Intent(this, MainUnityActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivityForResult(intent, 1);
+//        Intent it= new Intent();
+//        it.setAction(Intent.ACTION_VIEW);
+//        it.setData(Uri.parse("https://www.baidu.com"));
+//        it.addCategory(Intent.CATEGORY_HOME);
+//        startActivity(it);
+//        Intent intent = new Intent(this, FloatWindowService.class);
+//        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//        startActivityForResult(intent, 1);
+//         startService(intent);
+        floatWindow();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode == 1) isUnityLoaded = false;
-    }
-
-    public void unloadUnity(Boolean doShowToast) {
-        if(isUnityLoaded) {
-            Intent intent = new Intent(this, MainUnityActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            intent.putExtra("doQuit", true);
-            startActivity(intent);
-            isUnityLoaded = false;
+    private void floatWindow() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!Settings.canDrawOverlays(this)) {
+                Toast.makeText(this, "当前无权限 canDrawOverlays", Toast.LENGTH_SHORT).show();
+                startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), REQUEST_CODE);
+            } else {
+                startService(new Intent(this, FloatWindowService.class));
+            }
         }
-        else if(doShowToast) showToast("Show Unity First");
     }
 
-    public void btnUnloadUnity(View v) {
-        unloadUnity(true);
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE) {
+            if (!Settings.canDrawOverlays(this)) {
+                Toast.makeText(this, "授权失败", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "授权成功", Toast.LENGTH_SHORT).show();
+                startService(new Intent(this, FloatWindowService.class));
+            }
+        }
     }
 
-    public void showToast(String message) {
-        CharSequence text = message;
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(getApplicationContext(), text, duration);
-        toast.show();
-    }
 
     @Override
     public void onBackPressed() {

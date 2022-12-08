@@ -49,60 +49,60 @@ public class MainUnityActivity extends OverrideUnityActivity {
 
     public void addControlsToUnityFrame() {
         FrameLayout layout = mUnityPlayer;
-        {
-            Button myButton = new Button(this);
-            myButton.setText("Show Main");
-            myButton.setX(10);
-            myButton.setY(500);
+//        {
+//            Button myButton = new Button(this);
+//            myButton.setText("Show Main");
+//            myButton.setX(10);
+//            myButton.setY(500);
+//
+//            myButton.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                   showMainActivity("");
+//                }
+//            });
+//            layout.addView(myButton, 300, 200);
+//        }
 
-            myButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                   showMainActivity("");
-                }
-            });
-            layout.addView(myButton, 300, 200);
-        }
+//        {
+//            Button myButton = new Button(this);
+//            myButton.setText("Send Msg");
+//            myButton.setX(320);
+//            myButton.setY(500);
+//            myButton.setOnClickListener( new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    mUnityPlayer.UnitySendMessage("Cube", "ChangeColor", "red");
+//                }
+//            });
+//            layout.addView(myButton, 300, 200);
+//        }
 
-        {
-            Button myButton = new Button(this);
-            myButton.setText("Send Msg");
-            myButton.setX(320);
-            myButton.setY(500);
-            myButton.setOnClickListener( new View.OnClickListener() {
-                public void onClick(View v) {
-                    mUnityPlayer.UnitySendMessage("Cube", "ChangeColor", "yellow");
-                }
-            });
-            layout.addView(myButton, 300, 200);
-        }
+//        {
+//            Button myButton = new Button(this);
+//            myButton.setText("Unload");
+//            myButton.setX(630);
+//            myButton.setY(500);
+//
+//            myButton.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    mUnityPlayer.unload();
+//                }
+//            });
+//            layout.addView(myButton, 300, 200);
+//        }
 
-        {
-            Button myButton = new Button(this);
-            myButton.setText("Unload");
-            myButton.setX(630);
-            myButton.setY(500);
-
-            myButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    mUnityPlayer.unload();
-                }
-            });
-            layout.addView(myButton, 300, 200);
-        }
-
-        {
-            Button myButton = new Button(this);
-            myButton.setText("Finish");
-            myButton.setX(630);
-            myButton.setY(800);
-
-            myButton.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    finish();
-                }
-            });
-            layout.addView(myButton, 300, 200);
-        }
+//        {
+//            Button myButton = new Button(this);
+//            myButton.setText("Finish");
+//            myButton.setX(630);
+//            myButton.setY(800);
+//
+//            myButton.setOnClickListener(new View.OnClickListener() {
+//                public void onClick(View v) {
+//                    finish();
+//                }
+//            });
+//            layout.addView(myButton, 300, 200);
+//        }
     }
 
 
