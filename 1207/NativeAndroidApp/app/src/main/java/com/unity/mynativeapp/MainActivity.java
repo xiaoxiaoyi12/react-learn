@@ -18,10 +18,9 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
+import com.unity3d.player.UnityPlayerActivity;
 
-import com.unity3d.player.UnityPlayer;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends UnityPlayerActivity {
 
     private static final int REQUEST_CODE = 200;
     boolean isUnityLoaded = false;
@@ -31,8 +30,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
         handleIntent(getIntent());
 //        startActivityForResult(new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName())), REQUEST_CODE);
     }
@@ -46,28 +43,19 @@ public class MainActivity extends AppCompatActivity {
     void handleIntent(Intent intent) {
         if(intent == null || intent.getExtras() == null) return;
 
-        if(intent.getExtras().containsKey("setColor")){
-            View v = findViewById(R.id.button2);
-            switch (intent.getExtras().getString("setColor")) {
-                case "yellow": v.setBackgroundColor(Color.YELLOW); break;
-                case "red": v.setBackgroundColor(Color.RED); break;
-                case "blue": v.setBackgroundColor(Color.BLUE); break;
-                default: break;
-            }
-        }
+//        if(intent.getExtras().containsKey("setColor")){
+//            View v = findViewById(R.id.button2);
+//            switch (intent.getExtras().getString("setColor")) {
+//                case "yellow": v.setBackgroundColor(Color.YELLOW); break;
+//                case "red": v.setBackgroundColor(Color.RED); break;
+//                case "blue": v.setBackgroundColor(Color.BLUE); break;
+//                default: break;
+//            }
+//        }
     }
 
     public void btnLoadUnity(View v) {
         isUnityLoaded = true;
-//        Intent it= new Intent();
-//        it.setAction(Intent.ACTION_VIEW);
-//        it.setData(Uri.parse("https://www.baidu.com"));
-//        it.addCategory(Intent.CATEGORY_HOME);
-//        startActivity(it);
-//        Intent intent = new Intent(this, FloatWindowService.class);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//        startActivityForResult(intent, 1);
-//         startService(intent);
         floatWindow();
     }
 

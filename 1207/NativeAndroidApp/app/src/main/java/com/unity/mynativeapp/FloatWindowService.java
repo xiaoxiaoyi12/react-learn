@@ -4,13 +4,12 @@ import android.app.ActivityManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
+import android.view.MotionEvent;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
@@ -23,21 +22,18 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.RequiresApi;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 import com.unity3d.player.UnityPlayer;
+
+
 public class FloatWindowService extends Service {
-
-    private Handler handler = new Handler();
-
-    private Timer timer;
+    private static final String TAG = "FloatWindowService";
+//    private Handler handler = new Handler();
 
     protected UnityPlayer mUnityPlayer;
-    public FloatWindowService() {
-    }
+
+    int statusBarHeight = -1;
+//    public FloatWindowService() {
+//    }
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -45,19 +41,11 @@ public class FloatWindowService extends Service {
     }
     public void onCreate() {
         super.onCreate();
-//        Log.i(TAG, "MainService Created");
+        Log.i(TAG, "FloatWindowService Created");
         //OnCreate中来生成悬浮窗.
-//        showFloatingView();
-    }
-//    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             showFloatingView();
         }
-//        createWindowView();
-//        mUnityPlayer.windowFocusChanged(true);
-        return super.onStartCommand(intent, flags, startId);
     }
 
     /**
@@ -67,12 +55,12 @@ public class FloatWindowService extends Service {
     private void showFloatingView() {
         if (Settings.canDrawOverlays(getApplicationContext())) {
             //WindowManager 对象
-            WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
+            WindowManager manager = (WindowManager) getApplication().getSystemService(WINDOW_SERVICE);
 
-            //新建悬浮控件
-            Button button = new Button(this);
-            button.setText("Floating Window");
-            button.setBackgroundColor(Color.BLUE);
+//            //新建悬浮控件
+//            Button button = new Button(this);
+//            button.setText("Floating Window");
+//            button.setBackgroundColor(Color.BLUE);
 
             //设置layoutParams
             WindowManager.LayoutParams params = new WindowManager.LayoutParams();
@@ -86,37 +74,61 @@ public class FloatWindowService extends Service {
 //            params.height = WindowManager.LayoutParams.WRAP_CONTENT;
             //设置不阻挡其他view的触摸事件
             params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-            params.gravity = Gravity.LEFT | Gravity.TOP;
+            params.gravity = Gravity.RIGHT | Gravity.TOP;
             params.x = 0;
             params.y = 0;
-            params.width=400;
-            params.height=600;
+            params.width=600;
+            params.height=800;
 
-//            LayoutInflater inflater = LayoutInflater.from(getApplication());
-//            LinearLayout toucherLayout=(LinearLayout) inflater.inflate(R.layout.float_window, null);
+            LayoutInflater inflater = LayoutInflater.from(getApplication());
+            LinearLayout toucherLayout=(LinearLayout) inflater.inflate(R.layout.float_window, null);
             //添加view到windowManager
-            manager.addView(button, params);
+            manager.addView(toucherLayout, params);
+
 //        toucherLayout.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+//            int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+//            if (resourceId > 0) {
+//                statusBarHeight = getResources().getDimensionPixelSize(resourceId);
+//            }
+//            Log.i(TAG, "状态栏高度为:" + statusBarHeight);
 
+            mUnityPlayer= new UnityPlayer(this.getApplicationContext());
+//            mUnityPlayer = getApplication().getUnityPlayer();
+            ((RelativeLayout) toucherLayout.findViewById(R.id.rl_pet)).addView(mUnityPlayer);
+            mUnityPlayer.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    //ImageButton我放在了布局中心，布局一共300dp
+                    params.x = (int) event.getRawX() - 150;
+                    //这就是状态栏偏移量用的地方
+                    params.y = (int) event.getRawY() - 150 - statusBarHeight;
+                    manager.updateViewLayout(toucherLayout,params);
+                    return false;
+                }
+            });
 
-//            mUnityPlayer= new UnityPlayer(this.getApplicationContext());
-//
-////            mUnityPlayer = MainActivity.getUnityPlayer();
-//            ((RelativeLayout) toucherLayout.findViewById(R.id.pet)).addView(mUnityPlayer);
-//
-////            mUnityPlayer.start();
+//            mUnityPlayer.startOrientationListener(1);
 //            mUnityPlayer.resume();
             //触摸事件
 //            displayView.setOnTouchListener(new OnFloatingButtonTouchListener());
         }
     }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        mUnityPlayer.windowFocusChanged(true);  // 不能写
+        return super.onStartCommand(intent, flags, startId);
+    }
+
     @Override
     public void onDestroy() {
+        mUnityPlayer.pause();
+//        mUnityPlayer.onUnityPlayerQuitted();
+        mUnityPlayer.destroy();
         super.onDestroy();
-        // Service被终止的同时也停止定时器继续运行
-//        timer.cancel();
-//        timer = null;
-//        super.onDestroy();
+
     }
     private void createWindowView() {
         WindowManager windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
